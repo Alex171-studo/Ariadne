@@ -42,7 +42,7 @@ Ce projet est conçu pour être exécuté en local avec vos propres documents et
 ### 1. Cloner le dépôt et installer les dépendances
 
 ```bash
-git clone https://github.com/votre-username/ariadne.git
+git clone https://github.com/Alex171-studo/Ariadne
 cd ariadne
 uv sync  
 ```
@@ -97,4 +97,4 @@ streamlit run app.py
 
 Développé par **Godwill Alexis AGUEMON**, étudiant en Intelligence Artificielle & Big Data à ESIGELEC, à la recherche d'une alternance de 36 mois spécialisée en IA agentique et automatisation.
 
-[LinkedIn](https://www.linkedin.com/in/godwill-alexis-aguemon-51a38436a/) · [GitHub](#)
+[LinkedIn](https://www.linkedin.com/in/godwill-alexis-aguemon-51a38436a/) · 
