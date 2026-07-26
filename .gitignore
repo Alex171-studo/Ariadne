@@ -9,6 +9,4 @@ wheels/
 # Virtual environments
 .venv
 db/
-docs/
-target_project/
 .env
