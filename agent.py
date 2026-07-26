@@ -17,7 +17,7 @@ class AgentState(TypedDict):
     question: str
     decision: Literal["MCP", "RAG"]
     response: str
-
+    source_used: str
 class LLMDecision(BaseModel):
     decision:Literal["MCP", "RAG"] = Field(description="Action that should taken")
 
@@ -41,23 +41,32 @@ def routing_node(state: AgentState) :
 
 def rag_node(state: AgentState, config:RunnableConfig):
     rag_instance = config["configurable"]["rag_instance"]
-    response = rag_instance.query(state["question"])
-    return {"response": response}
+    result = rag_instance.query(state["question"])
+
+    sources_str = ", ".join(result["sources"]) if result["sources"] else "Base Vectorielle"
+    badge = f"🔍 Source : RAG ({sources_str})" 
+
+    return {
+        "response": result["answer"], 
+        "source_used": badge,
+        }
 
 def mcp_node(state: AgentState, config: RunnableConfig):
+
     mcp_instance: FileSystemMCP = config["configurable"]["mcp_instance"]
-
     analysis: MCPAction = mcp_chain.invoke({"question": state["question"]})
-
+    source = "📁 Source : MCP"
 
     if analysis.action_type == "tree":
         context_data = mcp_instance.get_tree()
+        source = "📁 Source : MCP (Arborescence)"
 
     elif analysis.action_type == "file":
         if analysis.file_path:
             try:
                 raw_content = mcp_instance.get_file_content(analysis.file_path)
                 context_data = f"Fichier demandé : {analysis.file_path}\n\nContenu :\n{raw_content}\n"
+                source = f"📁 Source : MCP (Fichier : {analysis.file_path})"
             except Exception as e:
                 context_data = f"Erreur lors de la lecture du fichier '{analysis.file_path}' : {e}"
         else:
@@ -70,7 +79,7 @@ def mcp_node(state: AgentState, config: RunnableConfig):
         "context": context_data, 
         "question": state["question"]
     })
-    return {"response": response.content}
+    return {"response": response.content, "source_used": source }
 
 def router_decision(state:AgentState):
     return state["decision"].lower()

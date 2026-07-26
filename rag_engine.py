@@ -6,8 +6,13 @@ from langchain_chroma import Chroma
 from prompts import RAG_PROMPT_TEMPLATE
 from config import model, embedding_model, DATABASE_DIR, DOCS_DIR
 from dotenv import load_dotenv
+from pydantic import BaseModel, Field
 
 load_dotenv(override=True)
+
+class RAGResponse(BaseModel):
+    answer:str=Field(description="The answer written for the user query")
+    source_used:list[str]=Field("Exact list of sources filename (ex ['company.md']) really ued to answer. Don't include no needed files")
 
 class RAGEngine:
     def __init__(self):
@@ -59,13 +64,24 @@ class RAGEngine:
             query=user_question,
             k=5,
         )
+        context_text = ""
+        sources_list = []
 
-        context_text = "\n\n".join([doc.page_content for doc in matching_docs])
-        chain = RAG_PROMPT_TEMPLATE | self.llm 
+        for doc in matching_docs:
+            source_path = doc.metadata.get("source", "Inconnu")
+            filename = os.path.basename(source_path)
+            sources_list.append(filename)
+            context_text += f"Source:{filename}\nContent: {doc.page_content}\n\n"
 
-        response = chain.invoke({
+        unique_sources = list(set(sources_list))
+        chain = RAG_PROMPT_TEMPLATE | self.llm.with_structured_output(RAGResponse)
+
+        response: RAGResponse = chain.invoke({
             "context": context_text,
             "question": user_question
         })
 
-        return response.content
+        return {
+            "answer": response.answer,
+            "sources": response.source_used,
+        }

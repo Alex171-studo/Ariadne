@@ -33,6 +33,8 @@ with st.sidebar:
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
+        if "source" in msg and msg["source"]:
+            st.caption(msg["source"])
         st.markdown(msg["content"])
 
 if prompt := st.chat_input("Pose une question sur le projet ou demande un fichier..."):
@@ -55,6 +57,12 @@ if prompt := st.chat_input("Pose une question sur le projet ou demande un fichie
             )
             
             response_text = final_state.get("response", "Une erreur est survenue.")
+            source_used = final_state.get("source_used")
+            st.caption(source_used)
             st.markdown(response_text)
             
-    st.session_state.messages.append({"role": "assistant", "content": response_text})
+    st.session_state.messages.append({
+        "role": "assistant", 
+        "content": response_text,
+        "source": source_used,
+    })
