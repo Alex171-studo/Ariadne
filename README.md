@@ -97,4 +97,4 @@ streamlit run app.py
 
 Développé par **Godwill Alexis AGUEMON**, étudiant en Intelligence Artificielle & Big Data à ESIGELEC, à la recherche d'une alternance de 36 mois spécialisée en IA agentique et automatisation.
 
-[LinkedIn](https://www.linkedin.com/in/godwill-alexis-aguemon-51a38436a/) · 
+[LinkedIn](https://www.linkedin.com/in/godwill-alexis-aguemon-51a38436a/)
